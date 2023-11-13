@@ -33,6 +33,8 @@ function Form() {
     const newItem = { quantity, desc, packed: false, id: Date.now() };
 
     console.log(newItem);
+    setDesc("");
+    setQuantity(1);
   }
 
   return (
