@@ -1,11 +1,5 @@
 import { useState } from "react";
 
-// const initialItems = [
-//   { id: 1, description: "Passports", quantity: 2, packed: false },
-//   { id: 2, description: "Socks", quantity: 12, packed: false },
-//   { id: 3, description: "Charger", quantity: 1, packed: true },
-// ];
-
 export default function App() {
   const [items, setItems] = useState([]);
 
@@ -34,7 +28,7 @@ export default function App() {
         onDeleteItem={handleDelete}
         onToggleItem={handleToggleItem}
       />
-      <Stats />
+      <Stats items={items} />
     </div>
   );
 }
@@ -120,10 +114,14 @@ function Item({ item, onDeleteItem, onToggleItem }) {
   );
 }
 
-function Stats() {
+function Stats({ items }) {
+  const numItems = items.length;
+
   return (
     <footer className='stats'>
-      <em>you have X items on your list, and you already packed X (X%)</em>
+      <em>
+        you have {numItems} items on your list, and you already packed X (X%)
+      </em>
     </footer>
   );
 }
