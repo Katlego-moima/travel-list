@@ -19,6 +19,9 @@ export default function App() {
     );
   }
 
+  function clearItems() {
+    setItems([]);
+  }
   return (
     <div className='app'>
       <Logo />
@@ -27,6 +30,7 @@ export default function App() {
         items={items}
         onDeleteItem={handleDelete}
         onToggleItem={handleToggleItem}
+        clearItems={clearItems}
       />
       <Stats items={items} />
     </div>
@@ -80,11 +84,26 @@ function Form({ onAddItems }) {
     </form>
   );
 }
-function PackingList({ items, onDeleteItem, onToggleItem }) {
+function PackingList({ items, onDeleteItem, onToggleItem, clearItems }) {
+  const [sortBy, setSortBy] = useState("input");
+
+  //using derived state
+  let sortedItems;
+
+  if (sortBy === "input") sortedItems = items;
+
+  if (sortBy === "description")
+    sortedItems = items.slice().sort((a, b) => a.desc.localeCompare(b.desc));
+
+  if (sortBy === "packed")
+    sortedItems = items
+      .slice()
+      .sort((a, b) => Number(a.packed) - Number(b.packed));
+
   return (
     <div className='list'>
       <ul>
-        {items.map((item) => (
+        {sortedItems.map((item) => (
           <Item
             item={item}
             key={item.id}
@@ -93,6 +112,14 @@ function PackingList({ items, onDeleteItem, onToggleItem }) {
           />
         ))}
       </ul>
+      <div className='actions'>
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value='input'>Sort by input order</option>
+          <option value='description'>Sort by description</option>
+          <option value='packed'>Sort by packed status</option>
+        </select>
+        <button onClick={clearItems}>Clear list</button>
+      </div>
     </div>
   );
 }
@@ -115,6 +142,12 @@ function Item({ item, onDeleteItem, onToggleItem }) {
 }
 
 function Stats({ items }) {
+  if (!items.length)
+    return (
+      <p className='stats'>
+        <em>Start adding items to your packing list 🚀</em>
+      </p>
+    );
   const numItems = items.length;
   const numPacked = items.filter((item) => item.packed).length;
   const perc = Math.round((numPacked / numItems) * 100);
@@ -122,8 +155,10 @@ function Stats({ items }) {
   return (
     <footer className='stats'>
       <em>
-        you have {numItems} items on your list, and you already packed{" "}
-        {numPacked} ({perc}%)
+        {perc === 100
+          ? "You got everything ready to go ✈️ !"
+          : `you have ${numItems} items on your list, and you already packed
+        ${numPacked} (${perc}%)`}
       </em>
     </footer>
   );
